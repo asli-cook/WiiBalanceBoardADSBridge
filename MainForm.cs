@@ -252,9 +252,9 @@ internal sealed class MainForm : Form
 
         if (_radios.Count == 0)
         {
-            _statusLabel.Text = "Windows ما شايف Bluetooth radio.";
+            _statusLabel.Text = "Windows cannot detect a Bluetooth adapter.";
             if (!silent)
-                AppendLog("ما لقيت محوّل بلوتوث عبر Windows Bluetooth API.");
+                AppendLog("No Bluetooth adapter was found through the Windows Bluetooth API.");
         }
         else
         {
@@ -299,7 +299,7 @@ internal sealed class MainForm : Form
         var isElevated = new WindowsPrincipal(WindowsIdentity.GetCurrent())
             .IsInRole(WindowsBuiltInRole.Administrator);
         AppendLog($"The bridge is running as administrator: {isElevated}.");
-        AppendLog("رح ضل دور على البورد، وبعيد المحاولة تلقائيًا إذا فصل.");
+        AppendLog("The app will keep searching for the board and reconnect automatically if it disconnects.");
 
         try
         {
@@ -314,7 +314,7 @@ internal sealed class MainForm : Form
                     radio = _radioPicker.SelectedItem as BalanceBoardBluetooth.Radio;
                     if (radio is null)
                     {
-                        _statusLabel.Text = "ما لقيت محوّل بلوتوث؛ عم جرّب من جديد…";
+                        _statusLabel.Text = "No Bluetooth adapter found; retrying…";
                         await Task.Delay(3000, cancellation.Token);
                         continue;
                     }
@@ -322,7 +322,7 @@ internal sealed class MainForm : Form
 
                 try
                 {
-                    AppendLog($"رح أستخدم الراديو المحدد فقط: {radio.Name}.");
+                    AppendLog($"Using the selected Bluetooth adapter only: {radio.Name}.");
                     var boardAddress = await Task.Run(
                         () => BalanceBoardBluetooth.PairOrWakeBoardAsync(radio, _settings.BoardBluetoothAddress, AppendLog, cancellation.Token),
                         cancellation.Token);
@@ -341,7 +341,7 @@ internal sealed class MainForm : Form
                             _statusLabel.Text = message;
                             if (DateTime.UtcNow >= nextHidLog)
                             {
-                                AppendLog("ناطر ويندوز يجهّز HID؛ رح ضل عم جرّب لحد ما يفتح جهاز البورد.");
+                                AppendLog("Waiting for Windows to initialize HID; retrying until the board sensor opens.");
                                 nextHidLog = DateTime.UtcNow.AddSeconds(10);
                             }
                             await Task.Delay(500, cancellation.Token);
@@ -355,14 +355,14 @@ internal sealed class MainForm : Form
                     {
                         _statusLabel.Text = "Connected. Using your saved calibration.";
                         _calibrationLabel.Text = "Saved calibration loaded. Recalibrate only when needed.";
-                        AppendLog("تم تحميل المعايرة المحفوظة؛ ما في داعي تعيدها.");
+                        AppendLog("Loaded the saved calibration. Recalibration is not needed.");
                         _enableOutput.Enabled = true;
                         ApplySavedOutputPreference();
                     }
                     else
                     {
                         _statusLabel.Text = "Connected. Keep the board empty for its first calibration.";
-                        AppendLog("أول معايرة: خلي البورد فاضي خمس ثواني؛ بعدها بيحفظها وبيفعّل ADS تلقائيًا.");
+                        AppendLog("First calibration: leave the board empty for five seconds. The calibration will be saved, then ADS output will turn on automatically.");
                         BeginCalibration();
                     }
                     _ = RunBoardAsync(connection, cancellation.Token);
@@ -371,7 +371,7 @@ internal sealed class MainForm : Form
                 catch (OperationCanceledException) { throw; }
                 catch (Exception ex)
                 {
-                    AppendLog("Connection attempt failed; رح جرّب من جديد: " + ex.Message);
+                    AppendLog("Connection attempt failed; retrying: " + ex.Message);
                     _statusLabel.Text = "Connection issue; continuing to search…";
                     foreach (var oldRadio in _radios)
                         oldRadio.Dispose();

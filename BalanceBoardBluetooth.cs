@@ -69,8 +69,8 @@ internal static class BalanceBoardBluetooth
         CancellationToken cancellationToken)
     {
         log(knownBoardAddress is null
-            ? $"عم استخدم {radio.Name}. إذا البورد مقترن من قبل اضغط زره الأمامي؛ SYNC الأحمر مطلوب لأول اقتران فقط."
-            : $"عم استخدم {radio.Name}. اضغط زر البورد الأمامي لتشغيله؛ ما في داعي لزر SYNC داخل البطاريات بعد الاقتران الأول.");
+            ? $"Using {radio.Name}. If the board is already paired, press its front button; the red SYNC button is only needed for initial pairing."
+            : $"Using {radio.Name}. Press the board's front button to wake it; the battery-compartment SYNC button is not needed after initial pairing.");
         var boardSeen = false;
         var lastStatusLog = DateTime.UtcNow.AddSeconds(10);
         ulong lastLoggedCandidate = 0;
@@ -85,60 +85,60 @@ internal static class BalanceBoardBluetooth
                 boardSeen = true;
                 if (lastLoggedCandidate != device.Address)
                 {
-                    log($"لقيت جهاز Wii: {device.Name} ({device.Address:X12}).");
+                    log($"Found Wii device: {device.Name} ({device.Address:X12}).");
                     lastLoggedCandidate = device.Address;
                 }
 
                 if (device.Authenticated || device.Connected || device.Remembered)
-                    log("ويندوز حافظ الاقتران؛ عم حاول أوصل بالبورد من الزر الأمامي بدون إعادة SYNC.");
+                    log("Windows has a saved pairing; trying to connect using the board's front button without pressing SYNC again.");
                 else
-                    log("هذا أول اقتران على ويندوز؛ اضغط SYNC الأحمر داخل غطاء البطاريات الآن.");
+                    log("This is the first pairing on Windows; press the red SYNC button inside the battery cover now.");
 
                 if (!device.Authenticated && !device.Connected && !device.Remembered)
                 {
-                    log("عم جرّب اقتران SYNC بمفتاح Wii المشتق من عنوان محوّل البلوتوث...");
+                    log("Trying Wii SYNC pairing with the key derived from the Bluetooth adapter address...");
                     var authStatus = AuthenticateWithSyncPasskey(radio, ref device);
                     if (authStatus != 0 && authStatus != ErrorNoMoreItems)
                     {
-                        log($"ويندوز رفض مفتاح اقتران SYNC (رمز {authStatus}).");
+                        log($"Windows rejected the Wii SYNC pairing key (status {authStatus}).");
                         continue;
                     }
 
                     if (authStatus == 0)
-                        log("اقتران SYNC الموثّق نجح.");
+                        log("Authenticated SYNC pairing succeeded.");
                     else
-                        log("ويندوز يقول إن الجهاز موثّق من قبل؛ رح أتابع بتفعيل HID.");
+                        log("Windows reports that this device is already authenticated; continuing with HID activation.");
 
                     uint installedServiceCount = 0;
                     var enumerateStatus = BluetoothEnumerateInstalledServices(
                         radio.Handle, ref device, ref installedServiceCount, IntPtr.Zero);
                     if (enumerateStatus != 0 && enumerateStatus != ErrorMoreData)
                     {
-                        log($"تعذّر تثبيت سجلّ الاقتران في ويندوز (رمز {enumerateStatus}).");
+                        log($"Could not install the pairing record in Windows (status {enumerateStatus}).");
                         continue;
                     }
                 }
 
-                log("عم فعّل Bluetooth HID...");
+                log("Activating Bluetooth HID...");
                 var service = HidService;
                 var status = BluetoothSetServiceState(radio.Handle, ref device, ref service, ServiceEnable);
                 // Windows can report ERROR_INVALID_PARAMETER when the HID service is already active.
                 if (status == 0 || status == ErrorInvalidParameter || status == 0x80070057)
                 {
                     log(status == 0
-                        ? "تفعيل HID نجح. ناطر ويندوز يجهّز جهاز الحساسات..."
-                        : "خدمة HID موجودة أو مفعّلة مسبقًا؛ عم جرّب أفتح جهاز الحساسات...");
+                        ? "HID activation succeeded. Waiting for Windows to initialize the sensor device..."
+                        : "HID is already available; trying to open the sensor device...");
                     return device.Address;
                 }
 
-                log($"ويندوز ما فعّل HID (رمز {status}); رح جرّب دورة اكتشاف ثانية.");
+                log($"Windows did not activate HID (status {status}); retrying device discovery.");
             }
 
             if (DateTime.UtcNow >= lastStatusLog)
             {
                 log(boardSeen
-                    ? "لسا عم حاول أكمّل اتصال Wii Balance Board؛ رح تابع البحث تلقائيًا…"
-                    : "ما ظهر البورد بعد؛ شغّله من الزر الأمامي، ورح ضل عم دور…");
+                    ? "Still completing the Wii Balance Board connection; search will continue automatically…"
+                    : "The board has not appeared yet; wake it with the front button while the app keeps searching…");
                 lastStatusLog = DateTime.UtcNow.AddSeconds(10);
                 lastLoggedCandidate = 0;
             }

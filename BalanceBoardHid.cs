@@ -38,7 +38,7 @@ internal sealed class BalanceBoardHid : IDisposable
         var infoSet = SetupDiGetClassDevs(ref hidGuid, null, IntPtr.Zero, DigcfPresent | DigcfDeviceInterface);
         if (infoSet == new IntPtr(-1))
         {
-            message = $"تعذّر فحص HID: {Marshal.GetLastWin32Error()}";
+            message = $"Could not inspect HID: {Marshal.GetLastWin32Error()}";
             return null;
         }
 
@@ -84,7 +84,7 @@ internal sealed class BalanceBoardHid : IDisposable
                     if (!HidDGetPreparsedData(handle, out var preparsedData))
                     {
                         handle.Dispose();
-                        message = "ويندوز لقى البورد لكن ما قدر يقرأ وصف HID.";
+                        message = "Windows found the board but could not read its HID descriptor.";
                         return null;
                     }
 
@@ -95,11 +95,11 @@ internal sealed class BalanceBoardHid : IDisposable
                         if (status < 0 || caps.InputReportByteLength < 11 || caps.OutputReportByteLength < 7)
                         {
                             handle.Dispose();
-                            message = $"وصف تقارير HID غير متوقع (0x{status:X8}).";
+                            message = $"Unexpected HID report descriptor (0x{status:X8}).";
                             return null;
                         }
 
-                        message = "اتصل Wii Balance Board عبر HID.";
+                        message = "Connected to the Wii Balance Board through HID.";
                         return new BalanceBoardHid(handle, caps.InputReportByteLength, caps.OutputReportByteLength);
                     }
                     finally
@@ -118,7 +118,7 @@ internal sealed class BalanceBoardHid : IDisposable
             SetupDiDestroyDeviceInfoList(infoSet);
         }
 
-        message = "ما لقيت Nintendo Wii Balance Board (VID 057E / PID 0306) كجهاز HID.";
+        message = "Nintendo Wii Balance Board (VID 057E / PID 0306) was not found as an HID device.";
         return null;
     }
 
