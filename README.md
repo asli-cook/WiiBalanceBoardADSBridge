@@ -1,47 +1,56 @@
 # Wii Balance Board ADS Bridge
 
-برنامج Windows يربط **Nintendo Wii Balance Board** عبر Bluetooth ويحوّل الوقوف عليه إلى ضغط مستمر على زر **Numpad 1**. عند رفع القدم، يحرّر البرنامج الزر. يمكن ربط Numpad 1 من إعدادات اللعبة بوظيفة ADS أو بأي أمر آخر.
+**Contact: [Instagram @as_li.3](https://www.instagram.com/as_li.3/)**
 
-واجهة البرنامج تعرض الضغط الحي، وتتيح معايرة البورد وحفظ عتبة الضغط والإعدادات. تظهر فيها عبارة **Made by ASLI**.
+Wii Balance Board ADS Bridge connects a **Nintendo Wii Balance Board** to Windows over Bluetooth and turns a detected step into a held **Numpad 1** key. When you step off, the app releases the key. Bind Numpad 1 to ADS or another action in your game.
 
-## المزايا
+The app shows live pressure, lets you calibrate the board, and saves the calibration and settings. Its interface includes the **Made by ASLI** label.
 
-- يبحث عن البورد تلقائيًا عند تشغيل التطبيق، ويواصل البحث إلى أن تشغّله من الزر الأمامي.
-- يعيد محاولة الاتصال إذا انقطع اتصال البورد.
-- يستخدم اقتران Bluetooth المحفوظ بعد الاقتران الأول؛ عند أول اقتران قد تحتاج إلى ضغط زر **SYNC** الأحمر داخل غطاء البطاريات.
-- يحفظ المعايرة وعتبة الضغط واختيار محوّل Bluetooth.
-- يرسل ضغطًا مستمرًا على Numpad 1 أثناء الوقوف، ثم يحرّره عند النزول.
-- لا يحتاج إلى vJoy، ولا يرسل نقرات ماوس أو أزرار تحكم.
-- يتضمن مثبتًا يضيف تشغيل التطبيق عند تسجيل الدخول إلى Windows بصلاحيات المسؤول، بعد موافقة UAC أثناء التثبيت.
+## Features
 
-## التثبيت
+- Searches for the board when the app starts and keeps searching until you wake it with the front button.
+- Reconnects automatically if the board disconnects.
+- Uses the saved Bluetooth pairing after the first pairing. Initial pairing may require pressing the red **SYNC** button inside the battery cover.
+- Saves calibration, pressure threshold, and Bluetooth adapter selection.
+- Holds Numpad 1 while you are standing on the board and releases it when you step off.
+- Does not require vJoy and does not send mouse clicks or controller buttons.
+- Includes a Windows installer that configures the app to run at sign-in with administrator privileges, after you approve UAC during installation.
 
-يتطلب البرنامج Windows 10 أو Windows 11 و **.NET 8 Desktop Runtime**. شغّل المثبّت كمسؤول ووافق على رسالة UAC. ينسخ المثبّت التطبيق إلى Program Files ويضيف مهمة مجدولة لتشغيله عند تسجيل الدخول. لا يعيد المثبّت ضبط ملف إعداداتك أو معايرتك المحفوظة.
+## Installation
 
-بعد التثبيت، شغّل البورد من الزر الأمامي. يبدأ البرنامج البحث والاتصال تلقائيًا. في المرة الأولى، اترك البورد خاليًا من الوزن لخمس ثوانٍ للمعايرة؛ تحفظ المعايرة وتُستخدم في المرات اللاحقة.
+Requirements: Windows 10 or Windows 11 and the **.NET 8 Desktop Runtime**.
 
-## إعداد اللعبة
+1. Download and run **Wii Balance Board ADS Setup.exe** from the [latest release](https://github.com/asli-cook/WiiBalanceBoardADSBridge/releases/latest).
+2. Approve the UAC prompt. The installer copies the app to Program Files and creates a scheduled task to run it at sign-in. Your saved settings and calibration are preserved.
+3. Wake the board with its front button. The app searches and connects automatically.
+4. On first use, leave the board empty for five seconds to calibrate it. The app saves the calibration for later sessions.
 
-اربط **Numpad 1** بوظيفة ADS أو الأمر المطلوب من إعدادات اللعبة. اختبر الزر أولًا في Notepad أو أداة اختبار لوحة مفاتيح. بعض الألعاب قد تتجاهل إدخال لوحة المفاتيح المُحاكى حتى لو ظهر في تطبيقات Windows العادية؛ يعتمد ذلك على اللعبة وإعداداتها.
+## Configure a game
 
-## البناء من المصدر
+Bind **Numpad 1** to ADS or the desired action in the game's settings. First, verify the key in Notepad or a keyboard tester. Some games may ignore simulated keyboard input even when it works in ordinary Windows apps; behavior depends on the game and its settings.
 
-يتطلب البناء Windows و .NET 8 SDK:
+## Build from source
+
+Requirements: Windows and the .NET 8 SDK.
 
 ```powershell
 dotnet publish .\BoardADSBridge.csproj -c Release -o .\publish
 ```
 
-لبناء مثبت Windows، شغّل:
+To build the Windows installer:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\installer\Build-Installer.ps1
 ```
 
-يستخدم بناء المثبّت IExpress المرفق مع Windows. يحتاج التطبيق إلى .NET 8 Desktop Runtime على الجهاز الذي سيشغّله.
+The installer build uses IExpress, which is included with Windows. The app requires the .NET 8 Desktop Runtime on the target computer.
 
-## الخصوصية والتراخيص
+## Privacy and licensing
 
-تُحفظ المعايرة والإعدادات محليًا في `%LOCALAPPDATA%\BalanceBoardADS\settings.json`. لا يتضمن المشروع رفعًا للبيانات أو اتصالًا بخدمة إنترنت.
+Calibration and settings are stored locally in %LOCALAPPDATA%\BalanceBoardADS\settings.json. The project does not upload data or connect to an internet service.
 
-لم يُضف ترخيص لإعادة استخدام هذا المشروع بعد. راجع تراخيص مكوّنات Windows و .NET قبل إعادة التوزيع.
+No reuse license has been added to this project. Review the Windows and .NET component licenses before redistribution.
+
+## Contact
+
+Questions or feedback? [Contact ASLI on Instagram @as_li.3](https://www.instagram.com/as_li.3/).
