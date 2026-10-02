@@ -1,0 +1,21 @@
+# Build and IDE outputs
+bin/
+obj/
+.vs/
+publish*/
+dist/
+
+# Local SDK and app state
+.dotnet-cli-home/
+.dotnet-home/
+.nuget-packages/
+.local-appdata/
+
+# Legacy vJoy implementation is not part of the keyboard-only app
+VJoyBootstrapper.cs
+VirtualJoystickOutput.cs
+ThirdParty/vJoy/
+
+# User-specific files
+*.user
+*.suo
