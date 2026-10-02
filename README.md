@@ -20,7 +20,7 @@ The app shows live pressure, lets you calibrate the board, and saves the calibra
 
 Requirements: Windows 10 or Windows 11 and the **.NET 8 Desktop Runtime**.
 
-1. Download and run **Wii Balance Board ADS Setup.exe** from the [latest release](https://github.com/asli-cook/WiiBalanceBoardADSBridge/releases/latest).
+1. Download and run **Wii-Balance-Board-ADS-Setup.exe** from the [latest release](https://github.com/asli-cook/WiiBalanceBoardADSBridge/releases/latest).
 2. Approve the UAC prompt. The installer copies the app to Program Files and creates a scheduled task to run it at sign-in. Your saved settings and calibration are preserved.
 3. Wake the board with its front button. The app searches and connects automatically.
 4. On first use, leave the board empty for five seconds to calibrate it. The app saves the calibration for later sessions.
